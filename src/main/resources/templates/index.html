@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solo Cerdos Barbosa - Sistema de Gestión</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #FFF3E0 0%, #FFE4C4 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: #8B4513;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #FFD700;
+            color: #8B4513;
+            font-weight: bold;
+        }
+
+        .tab-btn:hover {
+            background: #A0522D;
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Formularios */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #8B4513;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .btn {
+            background: #8B4513;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #8B4513;
+            color: white;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .action-buttons button {
+            margin: 0 3px;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 500px;
+            margin: 100px auto;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #8B4513;
+        }
+
+        @media (max-width: 768px) {
+            table {
+                font-size: 12px;
+            }
+            th, td {
+                padding: 8px;
+            }
+            .action-buttons button {
+                padding: 3px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Solo Cerdos Barbosa</h1>
+        <img th:src="@{/imagen/solocerdos.jpg}" alt="Logo Solo Cerdos" style="width: 200px;">
+        <p>Sistema de Gestión de Productos, Clientes y Ventas</p>
+    </div>
+
+    <!-- Alertas -->
+    <div id="alertSuccess" class="alert alert-success"></div>
+    <div id="alertError" class="alert alert-error"></div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('productos')">📦 Productos</button>
+        <button class="tab-btn" onclick="showTab('clientes')">👥 Clientes</button>
+        <button class="tab-btn" onclick="showTab('ventas')">🛒 Ventas</button>
+    </div>
+
+    <!-- TAB PRODUCTOS -->
+    <div id="productos" class="tab-content active">
+        <h2>📦 Gestión de Productos</h2>
+
+        <!-- Formulario de productos -->
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+            <h3>Agregar/Editar Producto</h3>
+            <form id="productoForm">
+                <input type="hidden" id="productoId">
+                <div class="form-group">
+                    <label>Nombre:</label>
+                    <input type="text" id="productoNombre" required>
+                </div>
+                <div class="form-group">
+                    <label>Categoría:</label>
+                    <input type="text" id="productoCategoria" required>
+                </div>
+                <div class="form-group">
+                    <label>Precio:</label>
+                    <input type="number" step="0.01" id="productoPrecio" required>
+                </div>
+                <div class="form-group">
+                    <label>Cantidad:</label>
+                    <input type="number" id="productoCantidad" required>
+                </div>
+                <button type="submit" class="btn btn-success">💾 Guardar</button>
+                <button type="button" class="btn" onclick="limpiarFormProducto()">🗑️ Limpiar</button>
+            </form>
+        </div>
+
+        <!-- Tabla de productos -->
+        <h3>Lista de Productos</h3>
+        <div id="productosList"></div>
+    </div>
+
+    <!-- TAB CLIENTES -->
+    <div id="clientes" class="tab-content">
+        <h2>👥 Gestión de Clientes</h2>
+
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+            <h3>Agregar/Editar Cliente</h3>
+            <form id="clienteForm">
+                <input type="hidden" id="clienteId">
+                <div class="form-group">
+                    <label>Nombre:</label>
+                    <input type="text" id="clienteNombre" required>
+                </div>
+                <div class="form-group">
+                    <label>Dirección:</label>
+                    <input type="text" id="clienteDireccion" required>
+                </div>
+                <button type="submit" class="btn btn-success">💾 Guardar</button>
+                <button type="button" class="btn" onclick="limpiarFormCliente()">🗑️ Limpiar</button>
+            </form>
+        </div>
+
+        <h3>Lista de Clientes</h3>
+        <div id="clientesList"></div>
+    </div>
+
+    <!-- TAB VENTAS -->
+    <div id="ventas" class="tab-content">
+        <h2>🛒 Gestión de Ventas</h2>
+
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+            <h3>Registrar Nueva Venta</h3>
+            <form id="ventaForm">
+                <div class="form-group">
+                    <label>Fecha:</label>
+                    <input type="date" id="ventaFecha" required>
+                </div>
+                <div class="form-group">
+                    <label>Cliente:</label>
+                    <select id="ventaCliente" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Producto:</label>
+                    <select id="ventaProducto" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Cantidad:</label>
+                    <input type="number" id="ventaCantidad" required>
+                </div>
+                <button type="button" class="btn btn-info" onclick="agregarDetalleVenta()">➕ Agregar Producto</button>
+
+                <h4>Detalle de la Venta</h4>
+                <div id="detalleVentaList"></div>
+
+                <div class="form-group">
+                    <label>Total:</label>
+                    <input type="text" id="ventaTotal" readonly style="background: #f0f0f0; font-weight: bold;">
+                </div>
+
+                <button type="submit" class="btn btn-success">💾 Registrar Venta</button>
+            </form>
+        </div>
+
+        <h3>Historial de Ventas</h3>
+        <div id="ventasList"></div>
+    </div>
+</div>
+
+<script>
+    // Variables globales
+    let detalleVenta = [];
+
+    // API Base URL
+    const API_URL = '';
+
+    // Mostrar/Ocultar tabs
+    function showTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.getElementById(tabName).classList.add('active');
+        event.target.classList.add('active');
+
+        // Cargar datos según el tab
+        if (tabName === 'productos') cargarProductos();
+        if (tabName === 'clientes') cargarClientes();
+        if (tabName === 'ventas') {
+            cargarVentas();
+            cargarSelectores();
+        }
+    }
+
+    // Mostrar alerta
+    function showAlert(message, type) {
+        const alertDiv = document.getElementById(`alert${type === 'success' ? 'Success' : 'Error'}`);
+        alertDiv.textContent = message;
+        alertDiv.style.display = 'block';
+        setTimeout(() => {
+            alertDiv.style.display = 'none';
+        }, 3000);
+    }
+
+    // ==================== PRODUCTOS ====================
+    async function cargarProductos() {
+        const container = document.getElementById('productosList');
+        container.innerHTML = '<div class="loading">Cargando productos...</div>';
+
+        try {
+            const response = await fetch(`${API_URL}/api/productos`);
+            const productos = await response.json();
+
+            if (productos.length === 0) {
+                container.innerHTML = '<p>No hay productos registrados.</p>';
+                return;
+            }
+
+            let html = `
+                    <table>
+                        <thead>
+                            <tr><th>ID</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Cantidad</th><th>Acciones</th</tr>
+                        </thead>
+                        <tbody>
+                `;
+
+            productos.forEach(p => {
+                html += `
+                        <tr>
+                            <td>${p.id}</td>
+                            <td>${p.nombre}</td>
+                            <td>${p.categoria}</td>
+                            <td>$${p.precio.toLocaleString()}</td>
+                            <td>${p.cantidad}</td>
+                            <td class="action-buttons">
+                                <button class="btn btn-warning" onclick="editarProducto(${p.id})">✏️ Editar</button>
+                                <button class="btn btn-danger" onclick="eliminarProducto(${p.id})">🗑️ Eliminar</button>
+                            </td>
+                        </tr>
+                    `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        } catch (error) {
+            container.innerHTML = '<p style="color: red;">Error al cargar productos</p>';
+            console.error(error);
+        }
+    }
+
+    function editarProducto(id) {
+        fetch(`${API_URL}/api/productos`)
+            .then(res => res.json())
+            .then(productos => {
+                const producto = productos.find(p => p.id === id);
+                if (producto) {
+                    document.getElementById('productoId').value = producto.id;
+                    document.getElementById('productoNombre').value = producto.nombre;
+                    document.getElementById('productoCategoria').value = producto.categoria;
+                    document.getElementById('productoPrecio').value = producto.precio;
+                    document.getElementById('productoCantidad').value = producto.cantidad;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+    }
+
+    async function eliminarProducto(id) {
+        if (!confirm('¿Estás seguro de eliminar este producto?')) return;
+
+        try {
+            const response = await fetch(`${API_URL}/api/productos/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                showAlert('Producto eliminado exitosamente', 'success');
+                cargarProductos();
+                limpiarFormProducto();
+            } else {
+                showAlert('Error al eliminar producto', 'error');
+            }
+        } catch (error) {
+            showAlert('Error de conexión', 'error');
+        }
+    }
+
+    function limpiarFormProducto() {
+        document.getElementById('productoId').value = '';
+        document.getElementById('productoNombre').value = '';
+        document.getElementById('productoCategoria').value = '';
+        document.getElementById('productoPrecio').value = '';
+        document.getElementById('productoCantidad').value = '';
+    }
+
+    document.getElementById('productoForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById('productoId').value;
+        const producto = {
+            nombre: document.getElementById('productoNombre').value,
+            categoria: document.getElementById('productoCategoria').value,
+            precio: parseFloat(document.getElementById('productoPrecio').value),
+            cantidad: parseInt(document.getElementById('productoCantidad').value)
+        };
+
+        const url = id ? `${API_URL}/api/productos/${id}` : `${API_URL}/api/productos`;
+        const method = id ? 'PUT' : 'POST';
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(producto)
+            });
+
+            if (response.ok) {
+                showAlert(id ? 'Producto actualizado' : 'Producto creado', 'success');
+                cargarProductos();
+                limpiarFormProducto();
+            } else {
+                showAlert('Error al guardar producto', 'error');
+            }
+        } catch (error) {
+            showAlert('Error de conexión', 'error');
+        }
+    });
+
+    // ==================== CLIENTES ====================
+    async function cargarClientes() {
+        const container = document.getElementById('clientesList');
+        container.innerHTML = '<div class="loading">Cargando clientes...</div>';
+
+        try {
+            const response = await fetch(`${API_URL}/api/clientes`);
+            const clientes = await response.json();
+
+            if (clientes.length === 0) {
+                container.innerHTML = '<p>No hay clientes registrados.</p>';
+                return;
+            }
+
+            let html = `<table><thead><tr><th>ID</th><th>Nombre</th><th>Dirección</th><th>Acciones</th></tr></thead><tbody>`;
+            clientes.forEach(c => {
+                html += `
+                        <tr>
+                            <td>${c.id}</td>
+                            <td>${c.nombre}</td>
+                            <td>${c.direccion}</td>
+                            <td>
+                                <button class="btn btn-warning" onclick="editarCliente(${c.id})">✏️ Editar</button>
+                                <button class="btn btn-danger" onclick="eliminarCliente(${c.id})">🗑️ Eliminar</button>
+                            </td>
+                        </tr>
+                    `;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        } catch (error) {
+            container.innerHTML = '<p style="color: red;">Error al cargar clientes</p>';
+        }
+    }
+
+    function editarCliente(id) {
+        fetch(`${API_URL}/api/clientes`)
+            .then(res => res.json())
+            .then(clientes => {
+                const cliente = clientes.find(c => c.id === id);
+                if (cliente) {
+                    document.getElementById('clienteId').value = cliente.id;
+                    document.getElementById('clienteNombre').value = cliente.nombre;
+                    document.getElementById('clienteDireccion').value = cliente.direccion;
+                }
+            });
+    }
+
+    async function eliminarCliente(id) {
+        if (!confirm('¿Eliminar este cliente?')) return;
+        try {
+            const response = await fetch(`${API_URL}/api/clientes/${id}`, { method: 'DELETE' });
+            if (response.ok) {
+                showAlert('Cliente eliminado', 'success');
+                cargarClientes();
+                limpiarFormCliente();
+            }
+        } catch (error) {
+            showAlert('Error al eliminar', 'error');
+        }
+    }
+
+    function limpiarFormCliente() {
+        document.getElementById('clienteId').value = '';
+        document.getElementById('clienteNombre').value = '';
+        document.getElementById('clienteDireccion').value = '';
+    }
+
+    document.getElementById('clienteForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('clienteId').value;
+        const cliente = {
+            nombre: document.getElementById('clienteNombre').value,
+            direccion: document.getElementById('clienteDireccion').value
+        };
+
+        const url = id ? `${API_URL}/api/clientes/${id}` : `${API_URL}/api/clientes`;
+        const method = id ? 'PUT' : 'POST';
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(cliente)
+            });
+            if (response.ok) {
+                showAlert(id ? 'Cliente actualizado' : 'Cliente creado', 'success');
+                cargarClientes();
+                limpiarFormCliente();
+            }
+        } catch (error) {
+            showAlert('Error de conexión', 'error');
+        }
+    });
+
+    // ==================== VENTAS ====================
+    async function cargarSelectores() {
+        // Cargar clientes
+        const clientesRes = await fetch(`${API_URL}/api/clientes`);
+        const clientes = await clientesRes.json();
+        const selectCliente = document.getElementById('ventaCliente');
+        selectCliente.innerHTML = '<option value="">Seleccionar cliente</option>';
+        clientes.forEach(c => {
+            selectCliente.innerHTML += `<option value="${c.id}">${c.nombre}</option>`;
+        });
+
+        // Cargar productos
+        const productosRes = await fetch(`${API_URL}/api/productos`);
+        const productos = await productosRes.json();
+        const selectProducto = document.getElementById('ventaProducto');
+        selectProducto.innerHTML = '<option value="">Seleccionar producto</option>';
+        productos.forEach(p => {
+            selectProducto.innerHTML += `<option value="${p.id}" data-precio="${p.precio}" data-nombre="${p.nombre}">${p.nombre} - $${p.precio}</option>`;
+        });
+
+        document.getElementById('ventaFecha').value = new Date().toISOString().split('T')[0];
+    }
+
+    function agregarDetalleVenta() {
+        const productoSelect = document.getElementById('ventaProducto');
+        const productoId = productoSelect.value;
+        const productoNombre = productoSelect.options[productoSelect.selectedIndex]?.dataset?.nombre;
+        const precio = parseFloat(productoSelect.options[productoSelect.selectedIndex]?.dataset?.precio);
+        const cantidad = parseInt(document.getElementById('ventaCantidad').value);
+
+        if (!productoId || !cantidad || cantidad <= 0) {
+            showAlert('Seleccione un producto y cantidad válida', 'error');
+            return;
+        }
+
+        detalleVenta.push({
+            nombreProd: productoNombre,
+            cantProd: cantidad,
+            precio: precio
+        });
+
+        actualizarDetalleVenta();
+        document.getElementById('ventaCantidad').value = '';
+    }
+
+    function actualizarDetalleVenta() {
+        const container = document.getElementById('detalleVentaList');
+        let total = 0;
+        let html = '<table><thead><tr><th>Producto</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th><th></th></tr></thead><tbody>';
+
+        detalleVenta.forEach((item, index) => {
+            const subtotal = item.cantProd * item.precio;
+            total += subtotal;
+            html += `
+                    <tr>
+                        <td>${item.nombreProd}</td>
+                        <td>${item.cantProd}</td>
+                        <td>$${item.precio}</td>
+                        <td>$${subtotal}</td>
+                        <td><button class="btn btn-danger" onclick="eliminarDetalle(${index})">🗑️</button></td>
+                    </tr>
+                `;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+        document.getElementById('ventaTotal').value = total;
+    }
+
+    function eliminarDetalle(index) {
+        detalleVenta.splice(index, 1);
+        actualizarDetalleVenta();
+    }
+
+    async function cargarVentas() {
+        const container = document.getElementById('ventasList');
+        container.innerHTML = '<div class="loading">Cargando ventas...</div>';
+
+        try {
+            const response = await fetch(`${API_URL}/api/ventas`);
+            const ventas = await response.json();
+
+            if (ventas.length === 0) {
+                container.innerHTML = '<p>No hay ventas registradas.</p>';
+                return;
+            }
+
+            let html = `<table><thead><tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>`;
+            ventas.forEach(v => {
+                html += `
+                        <tr>
+                            <td>${v.id}</td>
+                            <td>${v.fecha}</td>
+                            <td>${v.idCliente}</td>
+                            <td>$${v.total?.toLocaleString() || 0}</td>
+                            <td>${v.estado}</td>
+                            <td><button class="btn btn-danger" onclick="eliminarVenta(${v.id})">🗑️</button></td>
+                        </tr>
+                    `;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        } catch (error) {
+            container.innerHTML = '<p style="color: red;">Error al cargar ventas</p>';
+        }
+    }
+
+    async function eliminarVenta(id) {
+        if (!confirm('¿Eliminar esta venta?')) return;
+        try {
+            await fetch(`${API_URL}/api/ventas/${id}`, { method: 'DELETE' });
+            showAlert('Venta eliminada', 'success');
+            cargarVentas();
+        } catch (error) {
+            showAlert('Error al eliminar', 'error');
+        }
+    }
+
+    document.getElementById('ventaForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (detalleVenta.length === 0) {
+            showAlert('Agregue al menos un producto', 'error');
+            return;
+        }
+
+        const venta = {
+            fecha: document.getElementById('ventaFecha').value,
+            estado: "COMPLETADA",
+            idCliente: parseInt(document.getElementById('ventaCliente').value),
+            detalle: detalleVenta,
+            total: parseFloat(document.getElementById('ventaTotal').value)
+        };
+
+        try {
+            const response = await fetch(`${API_URL}/api/ventas`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(venta)
+            });
+
+            if (response.ok) {
+                showAlert('Venta registrada exitosamente', 'success');
+                detalleVenta = [];
+                actualizarDetalleVenta();
+                cargarVentas();
+                document.getElementById('ventaForm').reset();
+                document.getElementById('ventaFecha').value = new Date().toISOString().split('T')[0];
+            } else {
+                showAlert('Error al registrar venta', 'error');
+            }
+        } catch (error) {
+            showAlert('Error de conexión', 'error');
+        }
+    });
+
+    // Cargar productos al iniciar
+    cargarProductos();
+</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Solo Cerdos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #FFF3E0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 350px;
+        }
+        h2 {
+            color: #8B4513;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #A0522D;
+        }
+        .error {
+            color: red;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        a {
+            color: #8B4513;
+            text-decoration: none;
+        }
+        .register-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h2>🐷 Solo Cerdos Barbosa</h2>
+    <h3>Iniciar Sesión</h3>
+
+    <div th:if="${param.error}" class="error">Usuario o contraseña incorrectos</div>
+    <div th:if="${param.logout}" class="success" style="color:green;">Sesión cerrada correctamente</div>
+
+    <form action="/login" method="post">
+        <input type="text" name="username" placeholder="Usuario" required autofocus>
+        <input type="password" name="password" placeholder="Contraseña" required>
+        <button type="submit">Ingresar</button>
+    </form>
+
+    <div class="register-link">
+        ¿No tienes cuenta? <a href="/registro">Regístrate aquí</a>
+    </div>
+</div>
+</body>
+</html>

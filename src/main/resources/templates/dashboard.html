@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Solo Cerdos Barbosa - Sistema de Gestión</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #FFF3E0 0%, #FFE4C4 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 25px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .stats {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stats span {
+            font-size: 24px;
+            font-weight: bold;
+            display: block;
+        }
+
+        /* Navegación */
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: white;
+            color: #8B4513;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn.active {
+            background: #8B4513;
+            color: white;
+        }
+
+        /* Contenido de tabs */
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            color: #8B4513;
+            margin-bottom: 20px;
+            font-size: 24px;
+            border-left: 4px solid #FFD700;
+            padding-left: 15px;
+        }
+
+        /* Formularios */
+        .form-card {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .form-card h3 {
+            color: #8B4513;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .form-group {
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        input, select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #8B4513;
+        }
+
+        /* Tablas */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .data-table thead {
+            background: #8B4513;
+            color: white;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f5f5f5;
+        }
+
+        /* Botones */
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #8B4513;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #A0522D;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        /* Detalle de venta */
+        .detalle-item {
+            background: #f9f9f9;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid #8B4513;
+        }
+
+        .total-box {
+            background: #8B4513;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: right;
+            margin-top: 15px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* Mensajes */
+        .alert {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .badge {
+            background: #8B4513;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-group {
+                display: block;
+                margin-right: 0;
+            }
+
+            input, select {
+                width: 100%;
+            }
+
+            .data-table {
+                font-size: 12px;
+            }
+
+            .data-table th, .data-table td {
+                padding: 8px;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div>
+            <h1>
+                <img th:src="@{/imagen/solocerdos.jpg}" alt="Logo Solo Cerdos" style="width: 200px;">
+                Solo Cerdos Barbosa
+            </h1>
+            <p>Sistema de Gestión Integral</p>
+        </div>
+        <div class="stats">
+            <span id="fechaActual"></span>
+            <small>Fecha actual</small>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    <div id="alertSuccess" class="alert alert-success"></div>
+    <div id="alertError" class="alert alert-error"></div>
+
+    <!-- Navegación -->
+    <div class="nav-buttons">
+        <button class="nav-btn active" onclick="showTab('productos')">
+            📦 Productos <span id="totalProductos" class="badge" style="background: #FFD700; color:#8B4513; margin-left:5px;">0</span>
+        </button>
+        <button class="nav-btn" onclick="showTab('clientes')">
+            👥 Clientes <span id="totalClientes" class="badge" style="background: #FFD700; color:#8B4513; margin-left:5px;">0</span>
+        </button>
+        <button class="nav-btn" onclick="showTab('ventas')">
+            🛒 Ventas <span id="totalVentas" class="badge" style="background: #FFD700; color:#8B4513; margin-left:5px;">0</span>
+        </button>
+    </div>
+
+    <!-- TAB PRODUCTOS -->
+    <div id="productos" class="tab-content active">
+        <h2 class="section-title">📦 Gestión de Productos</h2>
+
+        <div class="form-card">
+            <h3>➕ Agregar / Editar Producto</h3>
+            <input type="hidden" id="prodId">
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="prodNombre" placeholder="Nombre del producto">
+            </div>
+            <div class="form-group">
+                <label>Categoría</label>
+                <input type="text" id="prodCategoria" placeholder="Categoría">
+            </div>
+            <div class="form-group">
+                <label>Precio ($)</label>
+                <input type="number" id="prodPrecio" placeholder="Precio">
+            </div>
+            <div class="form-group">
+                <label>Cantidad</label>
+                <input type="number" id="prodCantidad" placeholder="Cantidad">
+            </div>
+            <div class="form-group">
+                <button onclick="guardarProducto()" class="btn btn-success">💾 Guardar</button>
+                <button onclick="limpiarProducto()" class="btn btn-primary">🗑️ Limpiar</button>
+            </div>
+        </div>
+
+        <div id="productosTabla" class="data-table-wrapper"></div>
+    </div>
+
+    <!-- TAB CLIENTES -->
+    <div id="clientes" class="tab-content">
+        <h2 class="section-title">👥 Gestión de Clientes</h2>
+
+        <div class="form-card">
+            <h3>➕ Agregar / Editar Cliente</h3>
+            <input type="hidden" id="cliId">
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="cliNombre" placeholder="Nombre completo">
+            </div>
+            <div class="form-group">
+                <label>Dirección</label>
+                <input type="text" id="cliDireccion" placeholder="Dirección">
+            </div>
+            <div class="form-group">
+                <button onclick="guardarCliente()" class="btn btn-success">💾 Guardar</button>
+                <button onclick="limpiarCliente()" class="btn btn-primary">🗑️ Limpiar</button>
+            </div>
+        </div>
+
+        <div id="clientesTabla"></div>
+    </div>
+
+    <!-- TAB VENTAS -->
+    <div id="ventas" class="tab-content">
+        <h2 class="section-title">🛒 Registrar Venta</h2>
+
+        <div class="form-card">
+            <h3>📋 Datos de la Venta</h3>
+            <div class="form-group">
+                <label>📅 Fecha</label>
+                <input type="date" id="ventaFecha">
+            </div>
+            <div class="form-group">
+                <label>👤 Cliente</label>
+                <select id="ventaCliente" style="min-width: 200px;">
+                    <option value="">Seleccionar cliente</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <h3>🛍️ Agregar Productos</h3>
+            <div class="form-group">
+                <label>Producto</label>
+                <select id="ventaProducto" style="min-width: 250px;">
+                    <option value="">Seleccionar producto</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Cantidad</label>
+                <input type="number" id="ventaCantidad" min="1" value="1" style="width: 80px;">
+            </div>
+            <div class="form-group">
+                <button onclick="agregarDetalle()" class="btn btn-success">➕ Agregar</button>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <h3>📝 Detalle de la Venta</h3>
+            <div id="detalleLista"></div>
+            <div class="total-box" id="totalVenta">Total: $0</div>
+            <button onclick="registrarVenta()" class="btn btn-success" style="width: 100%; margin-top: 15px;">✅ Registrar Venta</button>
+        </div>
+
+        <h2 class="section-title" style="margin-top: 30px;">📜 Historial de Ventas</h2>
+        <div id="ventasTabla"></div>
+    </div>
+</div>
+
+<script>
+    let detalleVenta = [];
+
+    // Mostrar fecha actual
+    const hoy = new Date();
+    document.getElementById('fechaActual').textContent = hoy.toLocaleDateString('es-CO');
+
+    function showTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        event.target.classList.add('active');
+
+        if (tabName === 'productos') cargarProductos();
+        if (tabName === 'clientes') cargarClientes();
+        if (tabName === 'ventas') {
+            cargarVentas();
+            cargarSelectores();
+            document.getElementById('ventaFecha').value = hoy.toISOString().split('T')[0];
+        }
+    }
+
+    function mostrarMensaje(msg, tipo) {
+        const div = document.getElementById(tipo === 'success' ? 'alertSuccess' : 'alertError');
+        div.textContent = msg;
+        div.style.display = 'block';
+        setTimeout(() => div.style.display = 'none', 3000);
+    }
+
+    // ========== PRODUCTOS ==========
+    async function cargarProductos() {
+        try {
+            const res = await fetch('/api/productos');
+            const data = await res.json();
+            document.getElementById('totalProductos').textContent = data.length;
+
+            if (data.length === 0) {
+                document.getElementById('productosTabla').innerHTML = '<div class="empty-state">📦 No hay productos registrados</div>';
+                return;
+            }
+
+            let html = '<table class="data-table"><thead><tr><th>ID</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Cantidad</th><th>Acciones</th></tr></thead><tbody>';
+            data.forEach(p => {
+                html += `<tr>
+                        <td>${p.id}</td>
+                        <td><strong>${p.nombre}</strong></td>
+                        <td><span class="badge">${p.categoria || 'Sin categoría'}</span></td>
+                        <td><strong style="color:#28a745;">$${p.precio.toLocaleString()}</strong></td>
+                        <td>${p.cantidad}</td>
+                        <td>
+                            <button class="btn btn-warning" onclick="editarProducto(${p.id})">✏️ Editar</button>
+                            <button class="btn btn-danger" onclick="eliminarProducto(${p.id})">🗑️ Eliminar</button>
+                        </td>
+                    </tr>`;
+            });
+            html += '</tbody></table>';
+            document.getElementById('productosTabla').innerHTML = html;
+        } catch(e) {
+            document.getElementById('productosTabla').innerHTML = '<div class="empty-state">❌ Error al cargar productos</div>';
+        }
+    }
+
+    async function editarProducto(id) {
+        const res = await fetch('/api/productos');
+        const data = await res.json();
+        const p = data.find(x => x.id === id);
+        if(p) {
+            document.getElementById('prodId').value = p.id;
+            document.getElementById('prodNombre').value = p.nombre;
+            document.getElementById('prodCategoria').value = p.categoria;
+            document.getElementById('prodPrecio').value = p.precio;
+            document.getElementById('prodCantidad').value = p.cantidad;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    async function eliminarProducto(id) {
+        if(!confirm('¿Eliminar este producto?')) return;
+        await fetch('/api/productos/' + id, { method: 'DELETE' });
+        mostrarMensaje('Producto eliminado', 'success');
+        cargarProductos();
+        limpiarProducto();
+    }
+
+    async function guardarProducto() {
+        const id = document.getElementById('prodId').value;
+        const producto = {
+            nombre: document.getElementById('prodNombre').value,
+            categoria: document.getElementById('prodCategoria').value,
+            precio: parseFloat(document.getElementById('prodPrecio').value),
+            cantidad: parseInt(document.getElementById('prodCantidad').value)
+        };
+        const url = id ? '/api/productos/' + id : '/api/productos';
+        const method = id ? 'PUT' : 'POST';
+        const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(producto) });
+        if(res.ok) {
+            mostrarMensaje(id ? 'Producto actualizado' : 'Producto creado', 'success');
+            cargarProductos();
+            limpiarProducto();
+        }
+    }
+
+    function limpiarProducto() {
+        document.getElementById('prodId').value = '';
+        document.getElementById('prodNombre').value = '';
+        document.getElementById('prodCategoria').value = '';
+        document.getElementById('prodPrecio').value = '';
+        document.getElementById('prodCantidad').value = '';
+    }
+
+    // ========== CLIENTES ==========
+    async function cargarClientes() {
+        try {
+            const res = await fetch('/api/clientes');
+            const data = await res.json();
+            document.getElementById('totalClientes').textContent = data.length;
+
+            if (data.length === 0) {
+                document.getElementById('clientesTabla').innerHTML = '<div class="empty-state">👥 No hay clientes registrados</div>';
+                return;
+            }
+
+            let html = '<table class="data-table"><thead><tr><th>ID</th><th>Nombre</th><th>Dirección</th><th>Acciones</th></tr></thead><tbody>';
+            data.forEach(c => {
+                html += `<tr>
+                        <td>${c.id}</td>
+                        <td><strong>${c.nombre}</strong></td>
+                        <td>${c.direccion || 'Sin dirección'}</td>
+                        <td>
+                            <button class="btn btn-warning" onclick="editarCliente(${c.id})">✏️ Editar</button>
+                            <button class="btn btn-danger" onclick="eliminarCliente(${c.id})">🗑️ Eliminar</button>
+                        </td>
+                    </tr>`;
+            });
+            html += '</tbody></table>';
+            document.getElementById('clientesTabla').innerHTML = html;
+        } catch(e) {
+            document.getElementById('clientesTabla').innerHTML = '<div class="empty-state">❌ Error al cargar clientes</div>';
+        }
+    }
+
+    async function editarCliente(id) {
+        const res = await fetch('/api/clientes');
+        const data = await res.json();
+        const c = data.find(x => x.id === id);
+        if(c) {
+            document.getElementById('cliId').value = c.id;
+            document.getElementById('cliNombre').value = c.nombre;
+            document.getElementById('cliDireccion').value = c.direccion;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    async function eliminarCliente(id) {
+        if(!confirm('¿Eliminar este cliente?')) return;
+        await fetch('/api/clientes/' + id, { method: 'DELETE' });
+        mostrarMensaje('Cliente eliminado', 'success');
+        cargarClientes();
+        limpiarCliente();
+    }
+
+    async function guardarCliente() {
+        const id = document.getElementById('cliId').value;
+        const cliente = {
+            nombre: document.getElementById('cliNombre').value,
+            direccion: document.getElementById('cliDireccion').value
+        };
+        const url = id ? '/api/clientes/' + id : '/api/clientes';
+        const method = id ? 'PUT' : 'POST';
+        const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cliente) });
+        if(res.ok) {
+            mostrarMensaje(id ? 'Cliente actualizado' : 'Cliente creado', 'success');
+            cargarClientes();
+            limpiarCliente();
+        }
+    }
+
+    function limpiarCliente() {
+        document.getElementById('cliId').value = '';
+        document.getElementById('cliNombre').value = '';
+        document.getElementById('cliDireccion').value = '';
+    }
+
+    // ========== VENTAS ==========
+    async function cargarSelectores() {
+        const clientesRes = await fetch('/api/clientes');
+        const clientes = await clientesRes.json();
+        const selectCliente = document.getElementById('ventaCliente');
+        selectCliente.innerHTML = '<option value="">Seleccionar cliente</option>';
+        clientes.forEach(c => {
+            selectCliente.innerHTML += `<option value="${c.id}">${c.nombre}</option>`;
+        });
+
+        const productosRes = await fetch('/api/productos');
+        const productos = await productosRes.json();
+        const selectProducto = document.getElementById('ventaProducto');
+        selectProducto.innerHTML = '<option value="">Seleccionar producto</option>';
+        productos.forEach(p => {
+            selectProducto.innerHTML += `<option value="${p.id}" data-precio="${p.precio}" data-nombre="${p.nombre}">${p.nombre} - $${p.precio.toLocaleString()}</option>`;
+        });
+    }
+
+    function agregarDetalle() {
+        const select = document.getElementById('ventaProducto');
+        const productoId = select.value;
+        const productoNombre = select.options[select.selectedIndex]?.dataset?.nombre;
+        const precio = parseFloat(select.options[select.selectedIndex]?.dataset?.precio);
+        const cantidad = parseInt(document.getElementById('ventaCantidad').value);
+
+        if (!productoId || !cantidad || cantidad <= 0) {
+            mostrarMensaje('Seleccione un producto y cantidad válida', 'error');
+            return;
+        }
+
+        detalleVenta.push({
+            nombreProd: productoNombre,
+            cantProd: cantidad,
+            precio: precio
+        });
+
+        actualizarDetalle();
+        document.getElementById('ventaCantidad').value = '1';
+        select.value = '';
+    }
+
+    function actualizarDetalle() {
+        const container = document.getElementById('detalleLista');
+        let total = 0;
+        let html = '';
+
+        detalleVenta.forEach((item, index) => {
+            const subtotal = item.cantProd * item.precio;
+            total += subtotal;
+            html += `
+                    <div class="detalle-item">
+                        <div>
+                            <strong>${item.nombreProd}</strong><br>
+                            <small>${item.cantProd} x $${item.precio.toLocaleString()} = <strong style="color:#28a745;">$${subtotal.toLocaleString()}</strong></small>
+                        </div>
+                        <button class="btn btn-danger" onclick="eliminarDetalle(${index})">🗑️</button>
+                    </div>
+                `;
+        });
+
+        container.innerHTML = html || '<div class="empty-state">No hay productos agregados</div>';
+        document.getElementById('totalVenta').innerHTML = `💰 Total: $${total.toLocaleString()}`;
+    }
+
+    function eliminarDetalle(index) {
+        detalleVenta.splice(index, 1);
+        actualizarDetalle();
+    }
+
+    async function registrarVenta() {
+        const clienteId = document.getElementById('ventaCliente').value;
+        const fecha = document.getElementById('ventaFecha').value;
+
+        if (!clienteId) {
+            mostrarMensaje('Seleccione un cliente', 'error');
+            return;
+        }
+
+        if (detalleVenta.length === 0) {
+            mostrarMensaje('Agregue al menos un producto', 'error');
+            return;
+        }
+
+        const total = detalleVenta.reduce((sum, item) => sum + (item.cantProd * item.precio), 0);
+
+        const venta = {
+            fecha: fecha,
+            estado: "COMPLETADA",
+            idCliente: parseInt(clienteId),
+            detalle: detalleVenta,
+            total: total
+        };
+
+        try {
+            const res = await fetch('/api/ventas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(venta)
+            });
+
+            if (res.ok) {
+                mostrarMensaje('✅ Venta registrada exitosamente', 'success');
+                detalleVenta = [];
+                actualizarDetalle();
+                cargarVentas();
+                document.getElementById('ventaCliente').value = '';
+            } else {
+                mostrarMensaje('❌ Error al registrar venta', 'error');
+            }
+        } catch(e) {
+            mostrarMensaje('❌ Error de conexión', 'error');
+        }
+    }
+
+    async function cargarVentas() {
+        try {
+            const res = await fetch('/api/ventas');
+            const data = await res.json();
+            document.getElementById('totalVentas').textContent = data.length;
+
+            if (data.length === 0) {
+                document.getElementById('ventasTabla').innerHTML = '<div class="empty-state">🛒 No hay ventas registradas</div>';
+                return;
+            }
+
+            let html = '<table class="data-table"><thead><tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Total</th><th>Estado</th></tr></thead><tbody>';
+            data.forEach(v => {
+                html += `<tr>
+                        <td>${v.id}</td>
+                        <td>${v.fecha}</td>
+                        <td>Cliente #${v.idCliente}</td>
+                        <td><strong style="color:#28a745;">$${(v.total || 0).toLocaleString()}</strong></td>
+                        <td><span class="badge" style="background:#28a745;">${v.estado}</span></td>
+                    </tr>`;
+            });
+            html += '</tbody></table>';
+            document.getElementById('ventasTabla').innerHTML = html;
+        } catch(e) {
+            document.getElementById('ventasTabla').innerHTML = '<div class="empty-state">❌ Error al cargar ventas</div>';
+        }
+    }
+
+    // Cargar datos iniciales
+    cargarProductos();
+    cargarClientes();
+    cargarVentas();
+</script>
+</body>
+</html>
